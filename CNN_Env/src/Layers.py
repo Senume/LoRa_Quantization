@@ -68,7 +68,12 @@ class DenseLayer:
         self.output = self.weights@input
         self.output_size = self.output.shape
 
-        self.Activation.compute(input)
+        self.Activation.Compute(self.output)
+
+class InputLayer:
+
+    def __init__(self, input_size):
+        self.input_size = input_size
 
 class Flatten:
 
@@ -90,6 +95,7 @@ class Relu:
         self.derivative = None
 
     def Compute(self,dense_input):
+
         self.output = np.maximum(0,dense_input)
         self.output_size = self.output.shape
 
