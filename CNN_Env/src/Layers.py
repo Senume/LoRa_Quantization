@@ -46,26 +46,29 @@ class Convolution2D:
         
 class DenseLayer:
 
-    def __init__(self, input_size, node_count):
+    def __init__(self, input_size, node_count, activation_object):
 
         if type(input_size) is int and type(node_count) is int:
 
             self.input_size = input_size
             self.node_count = node_count
+            self.type = 'Dense'
+            self.Activation = activation_object
 
         else:
             ValueError("Input size and node_coutn must be 'int'")
 
 
         self.weights = np.random.random_sample((node_count, input_size))
-        self.bias = np.random.random_sample()
         self.output_size = None
         self.output = None
 
     def Compute(self, input):
 
-        self.output = self.weights@input + self.bias
+        self.output = self.weights@input
         self.output_size = self.output.shape
+
+        self.Activation.compute(input)
 
 class Flatten:
 
@@ -84,29 +87,45 @@ class Relu:
     def __init__(self, ):
         self.output = None
         self.output_size = None
+        self.derivative = None
 
     def Compute(self,dense_input):
         self.output = np.maximum(0,dense_input)
         self.output_size = self.output.shape
+
+        Temp = self.output >= 0
+        Temp.astype(np.int)
+
+        self.derivative = Temp
+        del Temp
+
     
 class Signmoid:
 
     def __init__(self, ):
         self.output = None
         self.output_size = None
+        self.derivative = None
 
     def Compute(self,dense_input):
         self.output = 1.0 / (1.0 + np.exp(-dense_input))
         self.output_size = self.output.shape
+
+        Temp = np.multiply(self.output, (1 - self.output))
+        self.derivative = Temp
+        del Temp
+
     
 class Softmax:
         
     def __init__(self, ):
         self.output = None
         self.output_size = None
+        self.derivative = None
 
     def Compute(self, dense_input):
         e_x = np.exp(dense_input - np.max(dense_input))
         self.output = e_x / e_x.sum()
         self.output_size = self.output.shape
+
         
